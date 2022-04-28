@@ -11,10 +11,12 @@ const useMainSearchBox = async (page: Page, searchString: string): Promise<void>
     */
 
     const mainSearchBox: Locator = page.locator(elementSelectors.mainSearchBox);
-    await mainSearchBox.type(searchString);
+    await mainSearchBox.type(searchString)
+        .catch(e => console.log('SEARCH FUNC ERR 1:', e));
 
     const mainSearchBoxSubmitButton: Locator = page.locator(elementSelectors.mainSearchBoxSubmitButton);
-    await mainSearchBoxSubmitButton.click();
+    await mainSearchBoxSubmitButton.click()
+        .catch(e => console.log('SEARCH FUNC ERR 2:', e));
 };
 
 export default useMainSearchBox;
