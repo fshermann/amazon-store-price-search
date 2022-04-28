@@ -16,7 +16,7 @@ const getLinkUrl = async (baseEl: Locator, selector: string) => {
     return await rowURLElement.evaluate((link) => link.getAttribute('href'));
 };
 
-const getElementText = async (baseEl: Locator, selector: string) => {
+const getElementText = async (baseEl: Locator, selector: string): Promise<string> => {
     /* 
     
         Accepts an element and selector. The selector is used in the 
@@ -25,10 +25,17 @@ const getElementText = async (baseEl: Locator, selector: string) => {
     */
 
     const rowTextElement: Locator = baseEl.locator(selector);
-    return await rowTextElement.innerText({ timeout: 2000 });
+    const rowTextElementCount = await rowTextElement.count();
+    
+    let rowText: string | void;
+    if(rowTextElementCount > 0) {
+        rowText = await rowTextElement.innerText({ timeout: 1000 })
+            .catch(e => console.log(e));
+    }
+    return rowText ? rowText : 'no text';
 };
 
-const harvestSearchResults = async (page: Page): Promise<object[]> => {
+const harvestSearchResults = async (page: Page, searchQuery: string): Promise<rowData[]> => {
     const searchResultsParent: Locator = page.locator(elementSelectors.searchResultsParent);
     await searchResultsParent.waitFor();
 
@@ -42,13 +49,16 @@ const harvestSearchResults = async (page: Page): Promise<object[]> => {
 
         const rowURL = await getLinkUrl(baseElement, elementSelectors.searchResultRowLink);
         const rowTitleText: string = await getElementText(baseElement, elementSelectors.searchResultRowTitle);
-        const rowDollarsString: string = await getElementText(baseElement, elementSelectors.searchResultRowDollars);
+        const rowDollarsText: string = await getElementText(baseElement, elementSelectors.searchResultRowDollars);
         const rowCentsText: string = await getElementText(baseElement, elementSelectors.searchResultRowCents);
 
         searchResults.push({
+            searchQuery,
             itemURL: `${amazonBaseURL}${rowURL}`,
             itemName: rowTitleText,
-            itemPrice: parseFloat(`${rowDollarsString.replace('\n', '')}${rowCentsText}`),
+            itemPrice: parseFloat(
+                `${rowDollarsText.replace('\n', '').replace(',', '')}${rowCentsText}`
+            ),
             dateTimeScraped: new Date()
         });
     }

@@ -11,7 +11,7 @@ const useMainSearchBox = async (page: Page, searchString: string): Promise<void>
     */
 
     const mainSearchBox: Locator = page.locator(elementSelectors.mainSearchBox);
-    await mainSearchBox.type(searchString)
+    await mainSearchBox.fill(searchString)
         .catch(e => console.log('SEARCH FUNC ERR 1:', e));
 
     const mainSearchBoxSubmitButton: Locator = page.locator(elementSelectors.mainSearchBoxSubmitButton);
