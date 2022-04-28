@@ -38,10 +38,11 @@ const getElementText = async (baseEl: Locator, selector: string): Promise<string
 const harvestSearchResults = async (page: Page, searchQuery: string): Promise<rowData[]> => {
     const searchResultsParent: Locator = page.locator(elementSelectors.searchResultsParent);
     await searchResultsParent.waitFor();
-
+    await page.waitForLoadState();
+    
     const resultRows: Locator = searchResultsParent.locator(elementSelectors.searchResultsRow);
     const numberOfRows = await resultRows.count();
-    console.log('NUMBER OR RESULT ROWS: ', numberOfRows);
+    console.log('NUMBER OF RESULT ROWS: ', numberOfRows);
 
     const searchResults: rowData[] = [];
     for (let i = 0; i < numberOfRows; i++) {
